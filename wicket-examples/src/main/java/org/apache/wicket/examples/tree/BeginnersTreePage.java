@@ -17,36 +17,49 @@
 package org.apache.wicket.examples.tree;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.MarkupContainer;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.markup.html.repeater.tree.DefaultNestedTree;
 import org.apache.wicket.model.IModel;
 
 /**
  * A very simple page containing a {@link DefaultNestedTree} only.
- * 
+ *
  * @author Sven Meier
  */
-public class BeginnersTreePage extends AbstractTreePage
-{
+public class BeginnersTreePage extends AbstractTreePage {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+    private DefaultNestedTree myTree;
+    private Boolean haveClicked=false;
 
-	/**
-	 * Construct.
-	 */
-	public BeginnersTreePage()
-	{
-		add(new DefaultNestedTree<Foo>("tree", new FooProvider())
-		{
+    /**
+     * Construct.
+     */
+    public BeginnersTreePage() {
+        System.out.println("I am a monkey... hello wor");
+        add(new AjaxLink<Void>("clickyMe") {
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                haveClicked=true;
+                target.add(myTree);
+            }
+        });
+        add(myTree = new DefaultNestedTree<Foo>("tree", new FooProvider()) {
 
-			/**
-			 * To use a custom component for the representation of a node's content we would
-			 * override this method.
-			 */
-			@Override
-			protected Component newContentComponent(String id, IModel<Foo> node)
-			{
-				return super.newContentComponent(id, node);
-			}
-		});
-	}
+            /**
+             * To use a custom component for the representation of a node's content we would
+             * override this method.
+             */
+            @Override
+            protected Component newContentComponent(String id, IModel<Foo> node) {
+                    if(haveClicked){
+                        expand(node.getObject());
+                    }
+                return super.newContentComponent(id, node);
+            }
+        });
+        myTree.setOutputMarkupId(true);
+    }
 }
